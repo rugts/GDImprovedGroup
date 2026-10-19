@@ -31,3 +31,4 @@ Proyecto del curso Fundamentos de Programacion - UPN.
 2. Agregar los archivos .cs de este repositorio (clic derecho al proyecto > Add > Existing Item) y reemplazar Program.cs.
 3. Presionar F5 o el boton Iniciar.
 4. Entrar con admin / 123 para agregar productos primero.
+https://drive.google.com/drive/folders/1jXq6QsSrWwpRSWfIZVu2LIRgmadCthPV?usp=sharing
