@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GDImproved.MainPage" Title="GOOD MOOV" BackgroundColor="#EAF2D6" Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="120,*">
+      <Grid Grid.Row="0" BackgroundColor="#C1EB63" Padding="10">
+        <Image Source="goodmoov_logo.png" HeightRequest="95" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center"/>
+      </Grid>
+    <ScrollView Grid.Row="1">
+        <VerticalStackLayout Padding="22" Spacing="12">
+            <VerticalStackLayout.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                    <Setter Property="BackgroundColor" Value="#D4DFAB"/>
+                    <Setter Property="TextColor" Value="#333333"/>
+                    <Setter Property="CornerRadius" Value="12"/>
+                </Style>
+                <Style TargetType="Label">
+                    <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                    <Setter Property="TextColor" Value="#333333"/>
+                </Style>
+                <Style TargetType="Entry">
+                    <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                    <Setter Property="TextColor" Value="#333333"/>
+                    <Setter Property="PlaceholderColor" Value="#555555"/>
+                    <Setter Property="BackgroundColor" Value="#F8FBEF"/>
+                </Style>
+                <Style TargetType="Picker">
+                    <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                    <Setter Property="TextColor" Value="#333333"/>
+                    <Setter Property="TitleColor" Value="#555555"/>
+                    <Setter Property="BackgroundColor" Value="#F8FBEF"/>
+                </Style>
+            </VerticalStackLayout.Resources>
+            <Label x:Name="Subtitulo" Text="Inicio de sesión" HorizontalOptions="Center"/>
+            <VerticalStackLayout x:Name="PanelLogin" Spacing="10">
+                <Entry x:Name="UsuarioEntry" Placeholder="Usuario"/>
+                <Entry x:Name="ClaveEntry" Placeholder="Contraseña" IsPassword="True"/>
+                <Button Text="Iniciar sesión" Clicked="LoginClicked"/>
+                <Button Text="Modo de aprendizaje (sin guardar)" Clicked="PracticaClicked"/>
+                <Button Text="Cómo utilizar el programa" Clicked="AyudaClicked"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="PanelTrabajo" IsVisible="False" Spacing="10">
+                <Picker x:Name="AccionPicker" Title="Selecciona una función" SelectedIndexChanged="AccionCambio"/>
+                <Label x:Name="Instruccion" FontSize="14"/>
+                <VerticalStackLayout x:Name="CamposPanel" Spacing="8">
+                    <Entry x:Name="Dato1" Placeholder="Dato 1" IsVisible="False"/>
+                    <Entry x:Name="Dato2" Placeholder="Dato 2" IsVisible="False"/>
+                    <Entry x:Name="Dato3" Placeholder="Dato 3" IsVisible="False"/>
+                    <Picker x:Name="PlatoPicker" Title="Selecciona un plato" SelectedIndexChanged="SeleccionPlatoCambio" IsVisible="False"/>
+                    <Picker x:Name="InsumoPicker" Title="Selecciona un insumo" SelectedIndexChanged="SeleccionInsumoCambio" IsVisible="False"/>
+                    <Picker x:Name="BoletaPicker" Title="Selecciona un comprobante" IsVisible="False"/>
+                    <Picker x:Name="RolNuevoPicker" Title="Selecciona rol" IsVisible="False"/>
+                    <VerticalStackLayout x:Name="RecetaPanel" IsVisible="False" Spacing="8">
+                        <Label Text="Insumos requeridos por plato" FontAttributes="Bold"/>
+                        <Label Text="Selecciona un insumo, escribe la cantidad y pulsa Añadir." FontSize="12"/>
+                        <Picker x:Name="RecetaInsumoPicker" Title="Insumo de la receta"/>
+                        <Entry x:Name="CantidadRecetaEntry" Placeholder="Cantidad de ese insumo (entero)" Keyboard="Numeric"/>
+                        <Button Text="Añadir ingrediente a la receta" Clicked="AnadirIngredienteClicked"/>
+                        <Label x:Name="RecetaListado" Text="Todavía no has añadido ingredientes."/>
+                        <Button Text="Limpiar ingredientes" Clicked="LimpiarIngredientesClicked"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+                <VerticalStackLayout x:Name="PedidoPanel" IsVisible="False" Spacing="8">
+                    <Label Text="Cantidad del plato seleccionado" FontAttributes="Bold"/>
+                    <Entry x:Name="CantidadPedidoEntry" Placeholder="Cantidad (entero)" Keyboard="Numeric"/>
+                    <Button Text="Añadir plato al pedido" Clicked="AgregarAlPedidoClicked"/>
+                    <Label Text="Platos incluidos en este pedido" FontAttributes="Bold"/>
+
+                    <VerticalStackLayout x:Name="CarritoFilasPanel" Spacing="8"/>
+                    <Label x:Name="CarritoListado" Text="Todavía no hay platos." FontAttributes="Bold"/>
+                    <Label Text="Puedes modificar el pedido antes de confirmarlo. El stock se revisa al guardar." FontSize="12"/>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout x:Name="CobroPanel" IsVisible="False" Spacing="8">
+                    <Label Text="Tipo de comprobante"/>
+                    <Picker x:Name="TipoComprobantePicker" SelectedIndexChanged="DocumentoCambio"/>
+                    <Label Text="Tipo de documento"/>
+                    <Picker x:Name="TipoDocumentoPicker" SelectedIndexChanged="DocumentoCambio"/>
+                    <Entry x:Name="NumeroDocumentoEntry" TextChanged="NumeroDocumentoCambio" Placeholder="Número de documento (opcional para boleta simple)"/>
+                    <Label Text="Medio de pago"/>
+                    <Picker x:Name="MedioPagoPicker"/>
+                    <Label Text="Boleta electrónica y factura: ejemplos internos, no comprobantes SUNAT." FontSize="12"/>
+                </VerticalStackLayout>
+                <Button x:Name="AbrirPdfBoton" Text="Ver PDF / imprimir" Clicked="AbrirPdfClicked" IsVisible="False"/>
+                <Button x:Name="EjecutarBoton" Text="Guardar" Clicked="EjecutarClicked" IsVisible="False"/>
+                <Label x:Name="ResultadoTitulo" Text="Información" FontSize="19" FontAttributes="Bold"/>
+                <Label x:Name="Resultado" Text="Selecciona una función." LineBreakMode="WordWrap"/>
+
+                <VerticalStackLayout x:Name="PedidosTarjetasPanel" Spacing="12" IsVisible="False"/>
+                <Button Text="Cerrar sesión" Clicked="SalirClicked"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+    <Grid x:Name="AvisoPanel" Grid.RowSpan="2" BackgroundColor="#EAF2D6" Padding="24" IsVisible="False">
+        <VerticalStackLayout VerticalOptions="Center" BackgroundColor="#F8FBEF" Padding="20" Spacing="16">
+            <Label x:Name="AvisoTitulo" Text="GOOD MOOV" FontFamily="FuenteGoodMoov" FontAttributes="Bold" FontSize="22" TextColor="#333333"/>
+            <Label x:Name="AvisoMensaje" Text="" FontFamily="FuenteGoodMoov" FontSize="16" TextColor="#333333" LineBreakMode="WordWrap"/>
+            <Button x:Name="AvisoAceptarBoton" Text="Aceptar" Clicked="AvisoAceptarClicked" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
+            <Button x:Name="ConfirmarSiBoton" Text="Sí, continuar" Clicked="ConfirmarSiClicked" IsVisible="False" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
+            <Button x:Name="ConfirmarNoBoton" Text="Ahora no" Clicked="ConfirmarNoClicked" IsVisible="False" BackgroundColor="#F0D4CF" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
+        </VerticalStackLayout>
+    </Grid>
+    </Grid>
+</ContentPage>
