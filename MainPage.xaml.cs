@@ -10,28 +10,35 @@ namespace GDImproved
     {
         Sistema sistema = new Sistema();
         string rolActual = "";
-        int[] ingredientes = new int[101];
+        int[] ingredientes = new int[Sistema.MaxInsumos + 1];
         int[] carritoPlatos = new int[100];
         int[] carritoCantidades = new int[100];
         int totalCarrito = 0;
-        string[] admin = { "Ver carta", "Agregar plato", "Editar receta", "Editar plato", "Eliminar plato", "Ver inventario", "Agregar insumo", "Editar insumo", "Eliminar insumo", "Reponer / merma", "Crear pedido", "Ver pedidos", "Cobrar mesa", "Ver boletas", "Ver PDF / imprimir", "Crear usuario", "Ver alertas", "Crear backup", "Recuperar último backup", "Ayuda" };
+        string[] admin = { "Ver carta", "Agregar plato", "Editar receta", "Editar plato", "Eliminar plato", "Ver inventario", "Agregar insumo", "Editar insumo", "Eliminar insumo", "Reponer / merma", "Crear pedido", "Ver pedidos", "Cobrar mesa", "Ver boletas", "Reportes de venta", "Ver PDF / imprimir", "Crear usuario", "Ver alertas", "Crear backup", "Recuperar último backup", "Ayuda" };
         string[] cocina = { "Ver carta", "Agregar plato", "Editar receta", "Ver inventario", "Agregar insumo", "Reponer / merma", "Ver pedidos", "Ver alertas", "Ayuda" };
         string[] mozo = { "Ver carta", "Crear pedido", "Ver pedidos", "Ver alertas", "Ayuda" };
         string[] caja = { "Ver pedidos", "Cobrar mesa", "Ver boletas", "Ver PDF / imprimir", "Ayuda" };
         public MainPage()
         {
             InitializeComponent();
+            MenuLateralScroll.IsVisible = false;
+            Grid.SetColumn(ContenidoScroll, 0);
+            Grid.SetColumnSpan(ContenidoScroll, 2);
             TipoComprobantePicker.Items.Add("Boleta simple");
             TipoComprobantePicker.Items.Add("Boleta electrónica");
             TipoComprobantePicker.Items.Add("Factura");
             TipoDocumentoPicker.Items.Add("DNI");
-            TipoDocumentoPicker.Items.Add("CE");
-            TipoDocumentoPicker.Items.Add("Pasaporte");
             TipoDocumentoPicker.Items.Add("RUC");
-            TipoDocumentoPicker.Items.Add("Otro");
             MedioPagoPicker.Items.Add("Efectivo");
             MedioPagoPicker.Items.Add("Tarjeta");
             MedioPagoPicker.Items.Add("Yape");
+            PeriodoReportePicker.Items.Add("Día");
+            PeriodoReportePicker.Items.Add("Mes");
+            PeriodoReportePicker.Items.Add("Año");
+            PeriodoReportePicker.SelectedIndex = 0;
+            FechaReportePicker.Date = DateTime.Today;
+            ActualizarBotonesPeriodoReporte();
+            ActualizarAyudaPeriodoReporte();
             TipoComprobantePicker.SelectedIndex = 0;
             TipoDocumentoPicker.SelectedIndex = 0;
             MedioPagoPicker.SelectedIndex = 0;
@@ -121,11 +128,47 @@ namespace GDImproved
             rolActual = rol;
             PanelLogin.IsVisible = false;
             PanelTrabajo.IsVisible = true;
+            MenuLateralScroll.IsVisible = true;
+            Grid.SetColumn(ContenidoScroll, 1);
+            Grid.SetColumnSpan(ContenidoScroll, 1);
+            MenuRolLabel.Text = sistema.ModoPractica ? "Modo aprendizaje · " + rol : "Área de " + rol;
             Subtitulo.Text = sistema.ModoPractica ? "APRENDIZAJE - " + rol : "Área de " + rol;
+
             AccionPicker.Items.Clear();
+            MenuLateralPanel.Children.Clear();
             string[] opciones = rol == "ADMIN" ? admin : rol == "COCINA" ? cocina : rol == "MOZO" ? mozo : caja;
-            for (int i = 0; i < opciones.Length; i++) AccionPicker.Items.Add(opciones[i]);
-            AccionPicker.SelectedIndex = 0;
+
+            for (int i = 0; i < opciones.Length; i++)
+            {
+                string opcion = opciones[i];
+                AccionPicker.Items.Add(opcion);
+                var boton = new Button
+                {
+                    Text = opcion,
+                    BackgroundColor = Color.FromArgb("#F8FBEF"),
+                    TextColor = Color.FromArgb("#333333"),
+                    FontFamily = "FuenteGoodMoov",
+                    CornerRadius = 10,
+                    Padding = new Thickness(12, 10),
+                    HorizontalOptions = LayoutOptions.Fill
+                };
+
+                boton.Clicked += OpcionMenuClicked;
+
+                MenuLateralPanel.Children.Add(boton);
+            }
+
+            if (AccionPicker.Items.Count > 0)
+                AccionPicker.SelectedIndex = 0;
+        }
+        void OpcionMenuClicked(object sender, EventArgs e)
+        {
+            Button boton = sender as Button;
+            if (boton == null) return;
+            if (AccionPicker.SelectedItem != null && AccionPicker.SelectedItem.ToString() == boton.Text)
+                AccionCambio(AccionPicker, EventArgs.Empty);
+            else
+                AccionPicker.SelectedItem = boton.Text;
         }
         void PracticaClicked(object sender, EventArgs e)
         {
@@ -134,8 +177,16 @@ namespace GDImproved
         void SalirClicked(object sender, EventArgs e)
         {
             sistema = new Sistema(); rolActual = "";
-            PanelLogin.IsVisible = true; PanelTrabajo.IsVisible = false;
-            UsuarioEntry.Text = ""; ClaveEntry.Text = ""; Subtitulo.Text = "Inicio de sesión"; totalCarrito = 0;
+            PanelLogin.IsVisible = true;
+            PanelTrabajo.IsVisible = false;
+            MenuLateralScroll.IsVisible = false;
+            Grid.SetColumn(ContenidoScroll, 0);
+            Grid.SetColumnSpan(ContenidoScroll, 2);
+            MenuLateralPanel.Children.Clear();
+            UsuarioEntry.Text = "";
+            ClaveEntry.Text = "";
+            Subtitulo.Text = "Inicio de sesión";
+            totalCarrito = 0;
         }
         void LimpiarCampos()
         {
@@ -143,9 +194,10 @@ namespace GDImproved
             Dato1.IsVisible = Dato2.IsVisible = Dato3.IsVisible = false;
             PlatoPicker.IsVisible = InsumoPicker.IsVisible = RolNuevoPicker.IsVisible = false;
             CobroPanel.IsVisible = false;
+            ReportesVentaPanel.IsVisible = false;
             PedidosTarjetasPanel.IsVisible = false; PedidosTarjetasPanel.Children.Clear();
             PedidoPanel.IsVisible = false; CantidadPedidoEntry.Text = ""; RecetaPanel.IsVisible = false; EjecutarBoton.IsVisible = false; AbrirPdfBoton.IsVisible = false; BoletaPicker.IsVisible = false;
-            ingredientes = new int[101]; MostrarIngredientes();
+            ingredientes = new int[Sistema.MaxInsumos + 1]; MostrarIngredientes();
         }
         void CampoVisible(Entry entrada, string titulo)
         {
@@ -195,9 +247,17 @@ namespace GDImproved
         }
         void AccionCambio(object sender, EventArgs e)
         {
-            LimpiarCampos(); RecargarSelectores();
-            totalCarrito = 0; MostrarCarrito();
             string a = AccionPicker.SelectedItem == null ? "" : AccionPicker.SelectedItem.ToString();
+            if (a == "Reportes de venta" && rolActual != "ADMIN")
+            {
+                LimpiarCampos();
+                Aviso("Los reportes de venta están disponibles únicamente para ADMIN.");
+                return;
+            }
+
+            LimpiarCampos(); RecargarSelectores();
+            Instruccion.IsVisible = true;
+            totalCarrito = 0; MostrarCarrito();
             Instruccion.Text = "Selecciona lo que deseas consultar.";
             switch (a)
             {
@@ -242,6 +302,20 @@ namespace GDImproved
                     numeroEraRuc = false;
                     actualizandoDocumento = false;
                     CampoVisible(Dato1, "Número de mesa"); CobroPanel.IsVisible = true; EjecutarBoton.IsVisible = true; EjecutarBoton.Text = "Cobrar mesa"; break;
+                case "Reportes de venta":
+                    ReportesVentaPanel.IsVisible = true;
+                    Instruccion.IsVisible = false;
+                    PeriodoReportePicker.SelectedIndex = 0;
+                    FechaReportePicker.Date = DateTime.Today;
+                    ActualizarBotonesPeriodoReporte();
+                    ActualizarAyudaPeriodoReporte();
+                    Instruccion.Text = "Sigue los tres pasos del panel para consultar las ventas.";
+                    ResultadoTitulo.Text = "Resultados del reporte";
+                    Resultado.Text = "Primero selecciona el período y la fecha. Luego pulsa BUSCAR REPORTES.";
+                    Resultado.IsVisible = true;
+                    ResultadoTablaPanel.Children.Clear();
+                    ResultadoTablaPanel.IsVisible = false;
+                    break;
                 case "Crear usuario":
                     CampoVisible(Dato1, "Nombre de usuario"); CampoVisible(Dato2, "Contraseña"); RolNuevoPicker.IsVisible = true;
                     EjecutarBoton.IsVisible = true; EjecutarBoton.Text = "Crear usuario"; break;
@@ -272,7 +346,7 @@ namespace GDImproved
             }
             ingredientes[id] = cantidad; CantidadRecetaEntry.Text = ""; MostrarIngredientes();
         }
-        void LimpiarIngredientesClicked(object sender, EventArgs e) { ingredientes = new int[101]; MostrarIngredientes(); }
+        void LimpiarIngredientesClicked(object sender, EventArgs e) { ingredientes = new int[Sistema.MaxInsumos + 1]; MostrarIngredientes(); }
         void EjecutarClicked(object sender, EventArgs e)
         {
             string a = AccionPicker.SelectedItem == null ? "" : AccionPicker.SelectedItem.ToString();
@@ -357,7 +431,7 @@ namespace GDImproved
             if (mensaje.Contains("correctamente") || mensaje.StartsWith("Plato registrado") || mensaje.StartsWith("Insumo registrado") || mensaje.StartsWith("Pedido registrado") || mensaje.StartsWith("Pedido #"))
             {
                 Dato1.Text = ""; Dato2.Text = ""; Dato3.Text = "";
-                if (a == "Agregar plato" || a == "Editar receta") { ingredientes = new int[101]; MostrarIngredientes(); }
+                if (a == "Agregar plato" || a == "Editar receta") { ingredientes = new int[Sistema.MaxInsumos + 1]; MostrarIngredientes(); }
             }
             RecargarSelectores(); ActualizarListado();
         }
@@ -387,15 +461,15 @@ namespace GDImproved
                 if (esRuc && !numeroEraRuc && TipoComprobantePicker.SelectedIndex != 2)
                 {
                     facturaAutomatica = true;
-                    TipoDocumentoPicker.SelectedIndex = 3; 
-                    TipoComprobantePicker.SelectedIndex = 2; 
+                    TipoDocumentoPicker.SelectedIndex = 1;
+                    TipoComprobantePicker.SelectedIndex = 2;
                 }
                 else if (!esRuc && facturaAutomatica)
                 {
 
                     facturaAutomatica = false;
-                    TipoComprobantePicker.SelectedIndex = 0; 
-                    TipoDocumentoPicker.SelectedIndex = 0; 
+                    TipoComprobantePicker.SelectedIndex = 0;
+                    TipoDocumentoPicker.SelectedIndex = 0;
                 }
                 numeroEraRuc = esRuc;
                 TipoDocumentoPicker.IsEnabled = TipoComprobantePicker.SelectedIndex != 2;
@@ -417,11 +491,11 @@ namespace GDImproved
 
                     facturaAutomatica = false;
                     if (TipoComprobantePicker.SelectedIndex == 2)
-                        TipoDocumentoPicker.SelectedIndex = 3; 
+                        TipoDocumentoPicker.SelectedIndex = 1;
                 }
                 else if (sender == TipoDocumentoPicker)
                 {
-                    if (TipoDocumentoPicker.SelectedIndex == 3)
+                    if (TipoDocumentoPicker.SelectedIndex == 1)
                     {
 
                         facturaAutomatica = false;
@@ -464,7 +538,8 @@ namespace GDImproved
                 var botones = new HorizontalStackLayout { Spacing = 8 };
                 var sumar = new Button
                 {
-                    Text = "+1", FontFamily = "FuenteGoodMoov",
+                    Text = "+1",
+                    FontFamily = "FuenteGoodMoov",
                     BackgroundColor = Color.FromArgb("#D4DFAB"),
                     TextColor = Color.FromArgb("#333333"),
                     CommandParameter = i
@@ -473,7 +548,8 @@ namespace GDImproved
 
                 var restar = new Button
                 {
-                    Text = "-1", FontFamily = "FuenteGoodMoov",
+                    Text = "-1",
+                    FontFamily = "FuenteGoodMoov",
                     BackgroundColor = Color.FromArgb("#D4DFAB"),
                     TextColor = Color.FromArgb("#333333"),
                     CommandParameter = i
@@ -482,7 +558,8 @@ namespace GDImproved
 
                 var quitar = new Button
                 {
-                    Text = "Quitar fila", FontFamily = "FuenteGoodMoov",
+                    Text = "Quitar fila",
+                    FontFamily = "FuenteGoodMoov",
                     BackgroundColor = Color.FromArgb("#D4DFAB"),
                     TextColor = Color.FromArgb("#333333"),
                     CommandParameter = i
@@ -593,6 +670,211 @@ namespace GDImproved
             }
         }
 
+        void PeriodoReporteDiaClicked(object sender, EventArgs e) { SeleccionarPeriodoReporte(0); }
+        void PeriodoReporteMesClicked(object sender, EventArgs e) { SeleccionarPeriodoReporte(1); }
+        void PeriodoReporteAnioClicked(object sender, EventArgs e) { SeleccionarPeriodoReporte(2); }
+
+        void SeleccionarPeriodoReporte(int indice)
+        {
+            PeriodoReportePicker.SelectedIndex = indice;
+            ActualizarBotonesPeriodoReporte();
+            ActualizarAyudaPeriodoReporte();
+            ResultadoTitulo.Text = "Resultados del reporte";
+            Resultado.Text = "Período seleccionado: " + PeriodoReportePicker.Items[indice] +
+                ". Ahora revisa la fecha y pulsa BUSCAR REPORTES.";
+            Resultado.IsVisible = true;
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = false;
+        }
+
+        void ActualizarBotonesPeriodoReporte()
+        {
+            bool dia = PeriodoReportePicker.SelectedIndex == 0;
+            bool mes = PeriodoReportePicker.SelectedIndex == 1;
+            bool anio = PeriodoReportePicker.SelectedIndex == 2;
+            Color seleccionado = Color.FromArgb("#496422");
+            Color textoSeleccionado = Colors.White;
+            Color fondoNormal = Colors.White;
+            Color textoNormal = Color.FromArgb("#333333");
+            Color bordeNormal = Color.FromArgb("#A8BC70");
+
+            PeriodoDiaBoton.BackgroundColor = dia ? seleccionado : fondoNormal;
+            PeriodoDiaBoton.TextColor = dia ? textoSeleccionado : textoNormal;
+            PeriodoDiaBoton.BorderColor = dia ? seleccionado : bordeNormal;
+            PeriodoMesBoton.BackgroundColor = mes ? seleccionado : fondoNormal;
+            PeriodoMesBoton.TextColor = mes ? textoSeleccionado : textoNormal;
+            PeriodoMesBoton.BorderColor = mes ? seleccionado : bordeNormal;
+            PeriodoAnioBoton.BackgroundColor = anio ? seleccionado : fondoNormal;
+            PeriodoAnioBoton.TextColor = anio ? textoSeleccionado : textoNormal;
+            PeriodoAnioBoton.BorderColor = anio ? seleccionado : bordeNormal;
+        }
+
+        void ActualizarAyudaPeriodoReporte()
+        {
+            string periodo = PeriodoReportePicker.SelectedItem?.ToString() ?? "Día";
+            AyudaPeriodoReporteLabel.Text = periodo == "Año"
+                ? "Se incluirán todas las ventas del año de la fecha seleccionada."
+                : periodo == "Mes"
+                    ? "Se incluirán las ventas del mes y año de la fecha seleccionada."
+                    : "Se incluirán únicamente las ventas de la fecha seleccionada.";
+        }
+
+        sealed class VentaReporte
+        {
+            public DateTime Fecha;
+            public string Comprobante = "";
+            public string Mesa = "";
+            public string MedioPago = "No indicado";
+            public decimal Total;
+        }
+
+        bool IntentarLeerFechaVenta(string texto, out DateTime fecha)
+        {
+            string valor = (texto ?? "").Trim();
+            string[] formatos = { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd H:mm:ss", "yyyy-MM-dd" };
+            if (DateTime.TryParseExact(valor, formatos, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AllowWhiteSpaces, out fecha))
+                return true;
+
+            return DateTime.TryParse(valor, CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces, out fecha);
+        }
+
+        void BuscarReportesVentaClicked(object sender, EventArgs e)
+        {
+            if (rolActual != "ADMIN")
+            {
+                ReportesVentaPanel.IsVisible = false;
+                Aviso("No tienes permiso para consultar los reportes de venta. Esta función es exclusiva de ADMIN.");
+                return;
+            }
+
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = true;
+            ResultadoTitulo.Text = "Resultados del reporte";
+
+            string periodo = PeriodoReportePicker.SelectedItem?.ToString() ?? "Día";
+            DateTime fechaElegida = FechaReportePicker.Date.Date;
+            VentaReporte[] ventas = new VentaReporte[sistema.Boletas.Length];
+            int totalVentas = 0;
+
+            for (int i = 0; i < sistema.TotalBoletas; i++)
+            {
+                string registro = sistema.Boletas[i];
+                if (string.IsNullOrWhiteSpace(registro)) continue;
+
+                string[] campos = registro.Split('|');
+                if (campos.Length < 4) continue;
+                if (!IntentarLeerFechaVenta(campos[3], out DateTime fechaVenta)) continue;
+
+                bool coincide = periodo == "Año"
+                    ? fechaVenta.Year == fechaElegida.Year
+                    : periodo == "Mes"
+                        ? fechaVenta.Year == fechaElegida.Year && fechaVenta.Month == fechaElegida.Month
+                        : fechaVenta.Date == fechaElegida.Date;
+                if (!coincide) continue;
+
+                string textoTotal = campos[2].Replace("S/", "").Trim().Replace(',', '.');
+                if (!decimal.TryParse(textoTotal, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal total))
+                    continue;
+
+                ventas[totalVentas] = new VentaReporte
+                {
+                    Fecha = fechaVenta,
+                    Comprobante = campos[0].Trim(),
+                    Mesa = campos[1].Trim(),
+                    Total = total,
+                    MedioPago = campos.Length >= 7 && !string.IsNullOrWhiteSpace(campos[6])
+                        ? campos[6].Trim() : "No indicado"
+                };
+                totalVentas++;
+            }
+
+            for (int i = 0; i < totalVentas - 1; i++)
+            {
+                for (int j = 0; j < totalVentas - i - 1; j++)
+                {
+                    if (ventas[j].Fecha < ventas[j + 1].Fecha)
+                    {
+                        VentaReporte temporal = ventas[j];
+                        ventas[j] = ventas[j + 1];
+                        ventas[j + 1] = temporal;
+                    }
+                }
+            }
+            decimal totalPeriodo = 0;
+            for (int i = 0; i < totalVentas; i++) totalPeriodo += ventas[i].Total;
+
+            string etiquetaPeriodo = periodo == "Año"
+                ? fechaElegida.ToString("yyyy", CultureInfo.InvariantCulture)
+                : periodo == "Mes"
+                    ? fechaElegida.ToString("MMMM yyyy", new CultureInfo("es-PE"))
+                    : fechaElegida.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+            Resultado.Text = "PERÍODO CONSULTADO: " + etiquetaPeriodo + " (" + periodo + ")" +
+                "\nCANTIDAD DE VENTAS: " + totalVentas +
+                "\nTOTAL VENDIDO: S/ " + totalPeriodo.ToString("0.00", CultureInfo.InvariantCulture);
+            Resultado.IsVisible = true;
+
+            if (totalVentas == 0)
+            {
+                ResultadoTablaPanel.Children.Add(new Label
+                {
+                    Text = "No se encontraron ventas para el período seleccionado.",
+                    FontFamily = "FuenteGoodMoov",
+                    TextColor = Color.FromArgb("#333333"),
+                    Padding = new Thickness(10)
+                });
+                return;
+            }
+
+            var tabla = new Grid { ColumnSpacing = 0, RowSpacing = 0, HorizontalOptions = LayoutOptions.Fill };
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.35, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.9, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.8, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.9, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.9, GridUnitType.Star) });
+            tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            AgregarCeldaTabla(tabla, 0, 0, "FECHA", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 1, "COMPROBANTE", true, false, false);
+            AgregarCeldaTabla(tabla, 0, 2, "MESA", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 3, "PAGO", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 4, "TOTAL", true, true, false);
+
+            for (int i = 0; i < totalVentas; i++)
+            {
+                var venta = ventas[i];
+                int fila = i + 1;
+                bool alternada = i % 2 == 0;
+                tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                AgregarCeldaTabla(tabla, fila, 0, venta.Fecha.ToString("dd/MM/yy HH:mm", CultureInfo.InvariantCulture), false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 1, venta.Comprobante, false, false, alternada);
+                AgregarCeldaTabla(tabla, fila, 2, venta.Mesa, false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 3, venta.MedioPago, false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 4, "S/ " + venta.Total.ToString("0.00", CultureInfo.InvariantCulture), false, true, alternada);
+            }
+            ResultadoTablaPanel.Children.Add(tabla);
+        }
+
+        void LimpiarReportesVentaClicked(object sender, EventArgs e)
+        {
+            if (rolActual != "ADMIN")
+            {
+                ReportesVentaPanel.IsVisible = false;
+                Aviso("Esta función es exclusiva del perfil ADMIN.");
+                return;
+            }
+
+            PeriodoReportePicker.SelectedIndex = 0;
+            FechaReportePicker.Date = DateTime.Today;
+            ActualizarBotonesPeriodoReporte();
+            ActualizarAyudaPeriodoReporte();
+            ResultadoTitulo.Text = "Resultados del reporte";
+            Resultado.Text = "Filtros limpiados. Elige Día, Mes o Año, selecciona la fecha y pulsa BUSCAR REPORTES.";
+            Resultado.IsVisible = true;
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = false;
+        }
+
         void AbrirPdfClicked(object sender, EventArgs e)
         {
             int numero = BoletaSeleccionada();
@@ -603,27 +885,27 @@ namespace GDImproved
         {
             string a = AccionPicker.SelectedItem == null ? "" : AccionPicker.SelectedItem.ToString();
             string texto = "";
+
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = false;
+            ResultadoTitulo.Text = "Información";
+
             if (a == "Ver carta")
             {
-                texto = sistema.CartaOrdenada();
+                MostrarTablaCarta();
+                ResultadoTitulo.Text = "Carta de GOOD MOOV";
             }
             else if (a == "Agregar plato" || a == "Editar plato" || a == "Eliminar plato" || a == "Editar receta" || a == "Crear pedido")
             {
-                for (int i = 0; i < sistema.TotalPlatos; i++)
-                {
-                    var p = sistema.Platos[i]; texto += p.Nombre + " | " + p.Categoria + " | S/ " + p.Precio + " | Disponibles: " + sistema.Disponibles(p.Id) + "\n";
-                }
-                if (texto == "") texto = "Todavía no hay platos. Agrega insumos y luego crea platos con recetas.";
-                if (a == "Crear pedido") texto += "\nALERTAS:\n" + sistema.Alertas();
+                MostrarTablaCarta();
+                ResultadoTitulo.Text = "Platos registrados";
+                if (a == "Crear pedido") texto = "ALERTAS DE INVENTARIO:\n" + sistema.Alertas();
             }
             else if (a == "Ver inventario" || a == "Agregar insumo" || a == "Editar insumo" || a == "Eliminar insumo" || a == "Reponer / merma" || a == "Ver alertas")
             {
-                for (int i = 0; i < sistema.TotalInsumos; i++)
-                {
-                    var x = sistema.Insumos[i]; texto += x.Nombre + " | Stock: " + x.Stock + " | Alerta: " + x.Alerta + "\n";
-                }
-                if (texto == "") texto = "Inventario vacío.\n";
-                texto += "\n" + sistema.Alertas();
+                MostrarTablaInsumos();
+                ResultadoTitulo.Text = "Inventario de insumos";
+                if (a == "Ver alertas" || a == "Ver inventario") texto = sistema.Alertas();
             }
             else if (a == "Ver pedidos" || a == "Cobrar mesa")
             {
@@ -663,13 +945,28 @@ namespace GDImproved
                 for (int i = 0; i < sistema.TotalBoletas; i++) texto += sistema.Boletas[i] + "\n";
                 if (texto == "") texto = "Todavía no hay boletas.";
             }
-            else if (a == "Ayuda") texto = "CUENTAS DE PRUEBA\nADMIN: admin / 1989\nCOCINA: cocina / 123\nMOZO: mozo / 123\nCAJA: caja / 123\n\n1. ADMIN administra usuarios, platos e inventario.\n2. COCINA revisa cada plato y pulsa Preparar, Listo, Entregado o Cancelar.\n3. MOZO añade varios platos al carrito y cambia cantidades antes de confirmar.\n4. CAJA solo cobra cuando todos los platos activos de la mesa están Entregados.\n5. ADMIN puede respaldar o recuperar los datos.\n\nLas cuatro cuentas de prueba tienen contraseñas fijas. Los demás usuarios creados se conservan. Los archivos .txt se guardan automáticamente. El modo aprendizaje no modifica los archivos reales.";
+            else if (a == "Reportes de venta")
+            {
+                if (rolActual == "ADMIN")
+                {
+                    ResultadoTitulo.Text = "Resultados del reporte";
+                    texto = "Selecciona el período, revisa la fecha y pulsa BUSCAR REPORTES.";
+                }
+                else
+                {
+                    ReportesVentaPanel.IsVisible = false;
+                    texto = "Los reportes de venta están disponibles únicamente para ADMIN.";
+                }
+            }
+            else if (a == "Ayuda") texto = "CUENTAS DE PRUEBA\nADMIN: admin / 1989\nCOCINA: cocina / 123\nMOZO: mozo / 123\nCAJA: caja / 123\n\n1. ADMIN administra usuarios, platos e inventario.\n2. COCINA revisa cada plato y pulsa Preparar, Listo, Entregado o Cancelar.\n3. MOZO añade varios platos al carrito y cambia cantidades antes de confirmar.\n4. CAJA solo cobra cuando todos los platos de la mesa están Entregados.\n5. ADMIN puede respaldar o recuperar los datos.\n\nLas cuatro cuentas de prueba tienen contraseñas fijas. Los demás usuarios creados se conservan. Los archivos .txt se guardan automáticamente. El modo aprendizaje no modifica los archivos reales.";
             else texto = "Completa el formulario de esta función.";
+
             bool mostrarTarjetas = (a == "Ver pedidos") &&
                 (rolActual == "COCINA" || rolActual == "ADMIN");
             if (mostrarTarjetas)
             {
                 Resultado.Text = "Cada plato conserva su propio estado. Los platos con el mismo Grupo pertenecen a un único pedido.";
+                Resultado.IsVisible = true;
                 MostrarTarjetasPedidos();
             }
             else
@@ -677,7 +974,181 @@ namespace GDImproved
                 PedidosTarjetasPanel.IsVisible = false;
                 PedidosTarjetasPanel.Children.Clear();
                 Resultado.Text = texto;
+                Resultado.IsVisible = !string.IsNullOrWhiteSpace(texto);
             }
+        }
+
+        int OrdenCategoriaCarta(string categoria)
+        {
+            string nombre = (categoria ?? "").Trim().ToLowerInvariant();
+            if (nombre == "entrada" || nombre == "entradas") return 0;
+            if (nombre == "plato fuerte" || nombre == "platos fuertes" || nombre == "fondo" || nombre == "fondos") return 1;
+            if (nombre == "postre" || nombre == "postres") return 2;
+            if (nombre == "bebida" || nombre == "bebidas") return 3;
+            return 4;
+        }
+
+        Border CrearCeldaTabla(string valor, bool encabezado, bool centrado, bool alternada, bool advertencia = false)
+        {
+            var etiqueta = new Label
+            {
+                Text = valor,
+                FontFamily = "FuenteGoodMoov",
+                FontSize = encabezado ? 13 : 13,
+                FontAttributes = (encabezado || advertencia) ? FontAttributes.Bold : FontAttributes.None,
+                TextColor = Color.FromArgb(advertencia ? "#8B1E1E" : "#333333"),
+                VerticalTextAlignment = TextAlignment.Center,
+                HorizontalTextAlignment = centrado ? TextAlignment.Center : TextAlignment.Start,
+                LineBreakMode = LineBreakMode.WordWrap
+            };
+
+            return new Border
+            {
+                Content = etiqueta,
+                Padding = new Thickness(8, 8),
+                BackgroundColor = Color.FromArgb(encabezado ? "#C1EB63" : advertencia ? "#FBE1DC" : alternada ? "#F8FBEF" : "#EFF5DD"),
+                Stroke = Color.FromArgb("#C8D6A3"),
+                StrokeThickness = 1,
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill
+            };
+        }
+
+        void AgregarCeldaTabla(Grid tabla, int fila, int columna, string valor,
+            bool encabezado, bool centrado, bool alternada, bool advertencia = false)
+        {
+            var celda = CrearCeldaTabla(valor, encabezado, centrado, alternada, advertencia);
+            Grid.SetRow(celda, fila);
+            Grid.SetColumn(celda, columna);
+            tabla.Children.Add(celda);
+        }
+
+        void MostrarTablaCarta()
+        {
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = true;
+
+            if (sistema.TotalPlatos == 0)
+            {
+                ResultadoTablaPanel.Children.Add(new Label
+                {
+                    Text = "Todavía no hay platos registrados. Agrega insumos y luego crea platos con sus recetas.",
+                    FontFamily = "FuenteGoodMoov",
+                    TextColor = Color.FromArgb("#333333"),
+                    Padding = new Thickness(10)
+                });
+                return;
+            }
+
+            var tabla = new Grid { ColumnSpacing = 0, RowSpacing = 0, HorizontalOptions = LayoutOptions.Fill };
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.25, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.9, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.95, GridUnitType.Star) });
+
+            tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            AgregarCeldaTabla(tabla, 0, 0, "PLATO", true, false, false);
+            AgregarCeldaTabla(tabla, 0, 1, "CATEGORÍA", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 2, "PRECIO", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 3, "DISPONIBLES", true, true, false);
+
+            var ordenados = new int[sistema.TotalPlatos];
+            for (int i = 0; i < ordenados.Length; i++) ordenados[i] = i;
+            for (int i = 0; i < ordenados.Length - 1; i++)
+            {
+                for (int j = 0; j < ordenados.Length - i - 1; j++)
+                {
+                    var primero = sistema.Platos[ordenados[j]];
+                    var segundo = sistema.Platos[ordenados[j + 1]];
+                    int categoria1 = OrdenCategoriaCarta(primero.Categoria);
+                    int categoria2 = OrdenCategoriaCarta(segundo.Categoria);
+                    bool intercambiar = categoria1 > categoria2;
+                    if (categoria1 == categoria2 && primero.Precio > segundo.Precio) intercambiar = true;
+                    if (intercambiar)
+                    {
+                        int temporal = ordenados[j];
+                        ordenados[j] = ordenados[j + 1];
+                        ordenados[j + 1] = temporal;
+                    }
+                }
+            }
+
+            for (int i = 0; i < ordenados.Length; i++)
+            {
+                var plato = sistema.Platos[ordenados[i]];
+                int fila = i + 1;
+                bool alternada = i % 2 == 0;
+                tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                AgregarCeldaTabla(tabla, fila, 0, plato.Nombre, false, false, alternada);
+                AgregarCeldaTabla(tabla, fila, 1, plato.Categoria, false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 2, "S/ " + plato.Precio.ToString("0.00", CultureInfo.InvariantCulture), false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 3, sistema.Disponibles(plato.Id).ToString(), false, true, alternada);
+            }
+
+            ResultadoTablaPanel.Children.Add(tabla);
+        }
+
+        void MostrarTablaInsumos()
+        {
+            ResultadoTablaPanel.Children.Clear();
+            ResultadoTablaPanel.IsVisible = true;
+
+            if (sistema.TotalInsumos == 0)
+            {
+                ResultadoTablaPanel.Children.Add(new Label
+                {
+                    Text = "El inventario está vacío. Registra un insumo para comenzar.",
+                    FontFamily = "FuenteGoodMoov",
+                    TextColor = Color.FromArgb("#333333"),
+                    Padding = new Thickness(10)
+                });
+                return;
+            }
+
+            var tabla = new Grid { ColumnSpacing = 0, RowSpacing = 0, HorizontalOptions = LayoutOptions.Fill };
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.9, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.9, GridUnitType.Star) });
+            tabla.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
+
+            tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            AgregarCeldaTabla(tabla, 0, 0, "INSUMO", true, false, false);
+            AgregarCeldaTabla(tabla, 0, 1, "STOCK", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 2, "ALERTA", true, true, false);
+            AgregarCeldaTabla(tabla, 0, 3, "ESTADO", true, true, false);
+
+            var ordenados = new int[sistema.TotalInsumos];
+            for (int i = 0; i < ordenados.Length; i++) ordenados[i] = i;
+            for (int i = 0; i < ordenados.Length - 1; i++)
+            {
+                for (int j = 0; j < ordenados.Length - i - 1; j++)
+                {
+                    string primero = sistema.Insumos[ordenados[j]].Nombre;
+                    string segundo = sistema.Insumos[ordenados[j + 1]].Nombre;
+                    if (string.Compare(primero, segundo, StringComparison.OrdinalIgnoreCase) > 0)
+                    {
+                        int temporal = ordenados[j];
+                        ordenados[j] = ordenados[j + 1];
+                        ordenados[j + 1] = temporal;
+                    }
+                }
+            }
+
+            for (int i = 0; i < ordenados.Length; i++)
+            {
+                var insumo = sistema.Insumos[ordenados[i]];
+                int fila = i + 1;
+                bool alternada = i % 2 == 0;
+                bool bajo = insumo.Stock <= insumo.Alerta;
+                tabla.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                AgregarCeldaTabla(tabla, fila, 0, insumo.Nombre, false, false, alternada);
+                AgregarCeldaTabla(tabla, fila, 1, insumo.Stock.ToString(), false, true, alternada);
+                AgregarCeldaTabla(tabla, fila, 2, insumo.Alerta.ToString(), false, true, alternada);
+                string estado = insumo.Stock == 0 ? "AGOTADO" : bajo ? "BAJO" : "OK";
+                AgregarCeldaTabla(tabla, fila, 3, estado, false, true, alternada, bajo);
+            }
+
+            ResultadoTablaPanel.Children.Add(tabla);
         }
 
         void MostrarTarjetasPedidos()
@@ -698,16 +1169,26 @@ namespace GDImproved
                 }
                 if (yaMostrado) continue;
                 var tarjeta = new VerticalStackLayout { Spacing = 9, Padding = new Thickness(12), BackgroundColor = Color.FromArgb("#F8FBEF") };
-                tarjeta.Children.Add(new Label { Text = "Mesa " + basePedido.Mesa + " · Pedido #" + grupo,
-                    FontFamily = "FuenteGoodMoov", FontAttributes = FontAttributes.Bold, FontSize = 18, TextColor = Color.FromArgb("#333333") });
+                tarjeta.Children.Add(new Label
+                {
+                    Text = "Mesa " + basePedido.Mesa + " · Pedido #" + grupo,
+                    FontFamily = "FuenteGoodMoov",
+                    FontAttributes = FontAttributes.Bold,
+                    FontSize = 18,
+                    TextColor = Color.FromArgb("#333333")
+                });
                 for (int j = i; j < sistema.TotalPedidos; j++)
                 {
                     var pedido = sistema.Pedidos[j];
                     if (pedido.Mesa != basePedido.Mesa || (pedido.GrupoId == 0 ? pedido.Id : pedido.GrupoId) != grupo) continue;
                     if (pedido.Estado == "Entregado" || pedido.Estado == "Cobrado" || pedido.Estado == "Cancelado") continue;
                     var linea = new VerticalStackLayout { Spacing = 5 };
-                    linea.Children.Add(new Label { Text = "Línea #" + pedido.Id + " · " + pedido.PlatoNombre + " x" + pedido.Cantidad + " · S/ " + pedido.Total().ToString("0.00"),
-                        FontFamily = "FuenteGoodMoov", TextColor = Color.FromArgb("#333333") });
+                    linea.Children.Add(new Label
+                    {
+                        Text = "Línea #" + pedido.Id + " · " + pedido.PlatoNombre + " x" + pedido.Cantidad + " · S/ " + pedido.Total().ToString("0.00"),
+                        FontFamily = "FuenteGoodMoov",
+                        TextColor = Color.FromArgb("#333333")
+                    });
                     linea.Children.Add(new Label { Text = "Estado: " + pedido.Estado, FontFamily = "FuenteGoodMoov", TextColor = Color.FromArgb("#333333") });
                     if (pedido.Observacion != "") linea.Children.Add(new Label { Text = "Observaciones: " + pedido.Observacion, FontFamily = "FuenteGoodMoov", TextColor = Color.FromArgb("#333333") });
                     string textoBoton = pedido.Estado == "Pendiente" ? "Comenzar preparación" : pedido.Estado == "En preparación" ? "Marcar listo" : "Marcar entregado";
