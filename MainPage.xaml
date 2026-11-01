@@ -2,11 +2,21 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GDImproved.MainPage" Title="GOOD MOOV" BackgroundColor="#EAF2D6" Shell.NavBarIsVisible="False">
-    <Grid RowDefinitions="120,*">
-      <Grid Grid.Row="0" BackgroundColor="#C1EB63" Padding="10">
-        <Image Source="goodmoov_logo.png" HeightRequest="95" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center"/>
-      </Grid>
-    <ScrollView Grid.Row="1">
+    <Grid RowDefinitions="96,*" ColumnDefinitions="250,*">
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" BackgroundColor="#C1EB63" Padding="10">
+            <Image Source="goodmoov_logo.png" HeightRequest="78" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
+        <ScrollView x:Name="MenuLateralScroll"  Grid.Row="1" Grid.Column="0" BackgroundColor="#D4DFAB" IsVisible="False">
+        <VerticalStackLayout Padding="14" Spacing="12">
+          <Label Text="GOOD MOOV" FontFamily="FuenteGoodMoov" FontSize="22" FontAttributes="Bold" TextColor="#333333" HorizontalOptions="Center" />
+          <Label x:Name="MenuRolLabel" Text="" FontFamily="FuenteGoodMoov" FontSize="14" TextColor="#333333" HorizontalOptions="Center" />
+          <BoxView HeightRequest="1" BackgroundColor="#A8BC70" />
+          <VerticalStackLayout x:Name="MenuLateralPanel" Spacing="8" />
+          <BoxView HeightRequest="1" BackgroundColor="#A8BC70" Margin="0,8,0,0" />
+          <Button Text="Cerrar sesión" Clicked="SalirClicked" BackgroundColor="#F8FBEF" TextColor="#333333" FontFamily="FuenteGoodMoov" CornerRadius="10" />
+        </VerticalStackLayout>
+      </ScrollView>
+    <ScrollView x:Name="ContenidoScroll" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="#EAF2D6">
         <VerticalStackLayout Padding="22" Spacing="12">
             <VerticalStackLayout.Resources>
                 <Style TargetType="Button">
@@ -33,7 +43,7 @@
                 </Style>
             </VerticalStackLayout.Resources>
             <Label x:Name="Subtitulo" Text="Inicio de sesión" HorizontalOptions="Center"/>
-            <VerticalStackLayout x:Name="PanelLogin" Spacing="10">
+            <VerticalStackLayout x:Name="PanelLogin" Spacing="10" HorizontalOptions="Center" WidthRequest="420">
                 <Entry x:Name="UsuarioEntry" Placeholder="Usuario"/>
                 <Entry x:Name="ClaveEntry" Placeholder="Contraseña" IsPassword="True"/>
                 <Button Text="Iniciar sesión" Clicked="LoginClicked"/>
@@ -41,7 +51,7 @@
                 <Button Text="Cómo utilizar el programa" Clicked="AyudaClicked"/>
             </VerticalStackLayout>
             <VerticalStackLayout x:Name="PanelTrabajo" IsVisible="False" Spacing="10">
-                <Picker x:Name="AccionPicker" Title="Selecciona una función" SelectedIndexChanged="AccionCambio"/>
+                <Picker x:Name="AccionPicker" Title="Selecciona una función" SelectedIndexChanged="AccionCambio" IsVisible="False"/>
                 <Label x:Name="Instruccion" FontSize="14"/>
                 <VerticalStackLayout x:Name="CamposPanel" Spacing="8">
                     <Entry x:Name="Dato1" Placeholder="Dato 1" IsVisible="False"/>
@@ -82,24 +92,71 @@
                     <Picker x:Name="MedioPagoPicker"/>
                     <Label Text="Boleta electrónica y factura: ejemplos internos, no comprobantes SUNAT." FontSize="12"/>
                 </VerticalStackLayout>
+                <Border x:Name="ReportesVentaPanel" IsVisible="False" Stroke="#A8BC70" StrokeThickness="1.5" StrokeShape="RoundRectangle 18" BackgroundColor="#F8FBEF"  Padding="18" Margin="0,4,0,8">
+                        <VerticalStackLayout Spacing="14">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Border Grid.Column="0" BackgroundColor="#E3F2C4" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12" VerticalOptions="Start">
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Reportes de venta" FontSize="22" FontAttributes="Bold" />
+                                </VerticalStackLayout>
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="#D4DFAB" />
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="ELIGE EL PERÍODO" FontSize="14" FontAttributes="Bold" />
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                    <Button x:Name="PeriodoDiaBoton" Grid.Column="0" Text="DÍA" Clicked="PeriodoReporteDiaClicked" HeightRequest="38" CornerRadius="10" FontAttributes="Bold" FontSize="13" BackgroundColor="#496422" TextColor="White" BorderColor="#496422" BorderWidth="1" />
+                                    <Button x:Name="PeriodoMesBoton" Grid.Column="1" Text="MES" Clicked="PeriodoReporteMesClicked" HeightRequest="38" CornerRadius="10" FontAttributes="Bold" FontSize="13" BackgroundColor="White" TextColor="#333333" BorderColor="#A8BC70" BorderWidth="1" />
+                                    <Button x:Name="PeriodoAnioBoton" Grid.Column="2" Text="AÑO" Clicked="PeriodoReporteAnioClicked" HeightRequest="38" CornerRadius="10" FontAttributes="Bold" FontSize="13" BackgroundColor="White" TextColor="#333333" BorderColor="#A8BC70" BorderWidth="1" />
+                                </Grid>
+                                <Picker x:Name="PeriodoReportePicker" Title="Período seleccionado" IsVisible="False" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="PASO 2  ·  SELECCIONA LA FECHA" FontSize="13" FontAttributes="Bold" />
+                                <Border Stroke="#D4DFAB"  StrokeThickness="1" StrokeShape="RoundRectangle 8" BackgroundColor="White"  Padding="6,2" HeightRequest="44">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <DatePicker x:Name="FechaReportePicker" Grid.Column="0" Format="dd/MM/yyyy" HorizontalOptions="Fill" VerticalOptions="Center" HeightRequest="36" FontSize="13" />
+                                        <Label Grid.Column="1" Text="CALENDARIO"   FontSize="10" FontAttributes="Bold" TextColor="#496422"  VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                                <Label x:Name="AyudaPeriodoReporteLabel" Text="Se buscará únicamente en la fecha seleccionada." FontSize="11" TextColor="#555555" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Spacing="5">
+                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="10" HorizontalOptions="Center">
+                                    <Button Grid.Column="0" Text="BUSCAR REPORTES" Clicked="BuscarReportesVentaClicked" WidthRequest="190" HeightRequest="42"  FontSize="13" FontAttributes="Bold"   CornerRadius="9" BackgroundColor="#496422"  TextColor="White" BorderColor="#496422" BorderWidth="1" />
+                                    <Button Grid.Column="1"  Text="Limpiar filtros" Clicked="LimpiarReportesVentaClicked"  WidthRequest="125"  HeightRequest="42" FontSize="11" CornerRadius="9"  BackgroundColor="#EAF2D6"  TextColor="#333333" BorderColor="#A8BC70" BorderWidth="1" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
                 <Button x:Name="AbrirPdfBoton" Text="Ver PDF / imprimir" Clicked="AbrirPdfClicked" IsVisible="False"/>
                 <Button x:Name="EjecutarBoton" Text="Guardar" Clicked="EjecutarClicked" IsVisible="False"/>
-                <Label x:Name="ResultadoTitulo" Text="Información" FontSize="19" FontAttributes="Bold"/>
-                <Label x:Name="Resultado" Text="Selecciona una función." LineBreakMode="WordWrap"/>
+                <Border Stroke="#D4DFAB" StrokeThickness="1" StrokeShape="RoundRectangle 14" BackgroundColor="#F8FBEF" Padding="14" Margin="0,4,0,8">
+                    <VerticalStackLayout Spacing="8">
+                        <Label x:Name="ResultadoTitulo" Text="Información" FontSize="19" FontAttributes="Bold"/>
+                        <Label x:Name="Resultado" Text="Selecciona una función." LineBreakMode="WordWrap"/>
+                        <VerticalStackLayout x:Name="ResultadoTablaPanel" IsVisible="False" Spacing="0" Margin="0,4,0,8"/>
+                    </VerticalStackLayout>
+                </Border>
 
                 <VerticalStackLayout x:Name="PedidosTarjetasPanel" Spacing="12" IsVisible="False"/>
-                <Button Text="Cerrar sesión" Clicked="SalirClicked"/>
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
-    <Grid x:Name="AvisoPanel" Grid.RowSpan="2" BackgroundColor="#EAF2D6" Padding="24" IsVisible="False">
-        <VerticalStackLayout VerticalOptions="Center" BackgroundColor="#F8FBEF" Padding="20" Spacing="16">
-            <Label x:Name="AvisoTitulo" Text="GOOD MOOV" FontFamily="FuenteGoodMoov" FontAttributes="Bold" FontSize="22" TextColor="#333333"/>
-            <Label x:Name="AvisoMensaje" Text="" FontFamily="FuenteGoodMoov" FontSize="16" TextColor="#333333" LineBreakMode="WordWrap"/>
-            <Button x:Name="AvisoAceptarBoton" Text="Aceptar" Clicked="AvisoAceptarClicked" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
-            <Button x:Name="ConfirmarSiBoton" Text="Sí, continuar" Clicked="ConfirmarSiClicked" IsVisible="False" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
-            <Button x:Name="ConfirmarNoBoton" Text="Ahora no" Clicked="ConfirmarNoClicked" IsVisible="False" BackgroundColor="#F0D4CF" TextColor="#333333" FontFamily="FuenteGoodMoov"/>
-        </VerticalStackLayout>
+    <Grid x:Name="AvisoPanel" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" ZIndex="99" BackgroundColor="#EAF2D6" Padding="20" IsVisible="False">
+        <Border HorizontalOptions="Center" VerticalOptions="Center" MaximumWidthRequest="680" MaximumHeightRequest="620" BackgroundColor="#F8FBEF" Stroke="#D4DFAB" StrokeThickness="2" Padding="20">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                <Label Grid.Row="0" x:Name="AvisoTitulo" Text="GOOD MOOV" FontFamily="FuenteGoodMoov" FontAttributes="Bold" FontSize="22" TextColor="#333333" />
+                <ScrollView Grid.Row="1" VerticalOptions="Fill">
+                    <Label x:Name="AvisoMensaje" Text="" FontFamily="FuenteGoodMoov" FontSize="16" TextColor="#333333" LineBreakMode="WordWrap" />
+                </ScrollView>
+                <VerticalStackLayout Grid.Row="2" Spacing="8">
+                    <Button x:Name="AvisoAceptarBoton" Text="Aceptar" Clicked="AvisoAceptarClicked" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov" />
+                    <Button x:Name="ConfirmarSiBoton" Text="Sí, continuar" Clicked="ConfirmarSiClicked" IsVisible="False" BackgroundColor="#D4DFAB" TextColor="#333333" FontFamily="FuenteGoodMoov" />
+                    <Button x:Name="ConfirmarNoBoton" Text="Ahora no" Clicked="ConfirmarNoClicked" IsVisible="False" BackgroundColor="#F0D4CF" TextColor="#333333" FontFamily="FuenteGoodMoov" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
     </Grid>
     </Grid>
 </ContentPage>
