@@ -10,12 +10,13 @@ namespace GDImproved.Logica
     public class Sistema
     {
         public Plato[] Platos = new Plato[100]; public int TotalPlatos;
-        public Insumo[] Insumos = new Insumo[100]; public int TotalInsumos;
+        public const int MaxInsumos = 150;
+        public Insumo[] Insumos = new Insumo[MaxInsumos]; public int TotalInsumos;
         public Pedido[] Pedidos = new Pedido[500]; public int TotalPedidos;
 
-        public int[,] ReservaIngredientes = new int[500, 101];
+        public int[,] ReservaIngredientes = new int[500, MaxInsumos + 1];
         public Usuario[] Usuarios = new Usuario[30]; public int TotalUsuarios;
-        public int[,] Recetas = new int[101, 101];
+        public int[,] Recetas = new int[101, MaxInsumos + 1];
         public string[] Boletas = new string[500]; public int TotalBoletas;
         Random azar = new Random();
         public string Carpeta = Path.Combine(FileSystem.Current.AppDataDirectory, "Datos");
@@ -30,7 +31,7 @@ namespace GDImproved.Logica
             if (practica) { InicializarUsuarios(); return; }
             Directory.CreateDirectory(Carpeta);
             InicializarUsuarios();
-            try { CargarTodo(); } catch (Exception e) { ErrorCarga = "No se pudo cargar: " + e.Message; }
+            try { CargarTodo(); CartaInicial.CargarSiVacio(this); } catch (Exception e) { ErrorCarga = "No se pudo cargar: " + e.Message; }
         }
         public void InicializarUsuarios()
         {
@@ -147,7 +148,7 @@ namespace GDImproved.Logica
             if (!TextoValido(nombre) || cantidad < 0 || alerta < 0) return "Revisa nombre, stock y alerta.";
             for (int i = 0; i < TotalInsumos; i++) if (Insumos[i].Nombre.Equals(nombre, StringComparison.OrdinalIgnoreCase)) return "Ese insumo ya existe: utiliza Reponer.";
             if (TotalInsumos >= Insumos.Length) return "Inventario lleno.";
-            int id = NuevoIdInsumo(); if (id > 100) return "Máximo 100 identificadores de insumos.";
+            int id = NuevoIdInsumo(); if (id > MaxInsumos) return "Máximo " + MaxInsumos + " identificadores de insumos.";
             Insumos[TotalInsumos++] = new Insumo { Id = id, Nombre = nombre, Stock = cantidad, Alerta = alerta };
             GuardarTodo(); return "Insumo registrado con ID " + id;
         }
@@ -183,7 +184,7 @@ namespace GDImproved.Logica
                 {
                     for (int j = i; j < TotalPlatos - 1; j++) Platos[j] = Platos[j + 1];
                     Platos[--TotalPlatos] = null;
-                    for (int k = 1; k <= 100; k++) Recetas[id, k] = 0;
+                    for (int k = 1; k <= MaxInsumos; k++) Recetas[id, k] = 0;
                     GuardarTodo(); return "Plato retirado de la carta. Pedidos anteriores conservados.";
                 }
             return "Plato no encontrado.";
@@ -268,30 +269,44 @@ namespace GDImproved.Logica
             if (indice < 1 || indice > TotalBoletas) return "";
             string encabezado = Boletas[indice - 1].Split('|')[0].Trim();
             int espacio = encabezado.LastIndexOf(' ');
-            return espacio < 0 ? indice.ToString("D5") : encabezado.Substring(espacio + 1);
+            return espacio < 0 ? encabezado : encabezado.Substring(espacio + 1);
         }
+
         string GenerarNumeroComprobante()
         {
-            string numero;
-            bool existe;
-            do
+            const string serie = "B372-";
+            int mayorCorrelativo = -1;
+
+            for (int i = 0; i < TotalBoletas; i++)
             {
-                numero = azar.Next(1, 10).ToString();
-                for (int d = 1; d < 12; d++) numero += azar.Next(0, 10).ToString();
-                existe = false;
-                for (int i = 0; i < TotalBoletas; i++)
-                {
-                    string encabezado = Boletas[i].Split('|')[0].Trim();
-                    if (encabezado.EndsWith(" " + numero, StringComparison.Ordinal)) existe = true;
-                }
-            } while (existe);
-            return numero;
+                if (string.IsNullOrWhiteSpace(Boletas[i])) continue;
+                string encabezado = Boletas[i].Split('|')[0].Trim();
+                int pos = encabezado.IndexOf(serie, StringComparison.OrdinalIgnoreCase);
+                if (pos < 0) continue;
+
+                string correlativo = encabezado.Substring(pos + serie.Length).Trim();
+                if (correlativo.Length == 8 && int.TryParse(correlativo, out int valor))
+                    if (valor > mayorCorrelativo) mayorCorrelativo = valor;
+            }
+
+            int siguiente;
+            if (mayorCorrelativo < 0)
+                siguiente = azar.Next(0, 100000000); 
+            else
+            {
+                if (mayorCorrelativo >= 99999999)
+                    throw new InvalidOperationException("Se agotó el correlativo de la serie B372.");
+                siguiente = mayorCorrelativo + 1;
+            }
+
+            return serie + siguiente.ToString("D8", CultureInfo.InvariantCulture);
         }
         public string RutaComprobante(int indice)
         {
             string referencia = NumeroComprobante(indice);
 
-            if (referencia.Length != 12) referencia = indice.ToString("D5");
+            if (!referencia.StartsWith("B372-", StringComparison.OrdinalIgnoreCase) || referencia.Length != 13)
+                referencia = "B372-" + indice.ToString("D8", CultureInfo.InvariantCulture);
             return Path.Combine(Carpeta, "Comprobantes", "comprobante_" + referencia + ".pdf");
         }
         public string GenerarPdfBoleta(int numero)
@@ -300,32 +315,27 @@ namespace GDImproved.Logica
             if (numero < 1 || numero > TotalBoletas) return "Selecciona una boleta válida.";
             string[] c = Boletas[numero - 1].Split('|');
             if (c.Length < 4) return "Registro de boleta no compatible.";
-            int mesa; if (!int.TryParse(c[1].Trim().Replace("Mesa ", ""), out mesa)) return "No se reconoce la mesa.";
-            string[] lineas = new string[550]; int n = 0;
-            lineas[n++] = "GOOD MOOV - COMPROBANTE INTERNO";
-            lineas[n++] = "Simulacion academica - sin validez tributaria";
-            lineas[n++] = c[0].Trim();
-            if (c.Length >= 7) { lineas[n++] = "Documento: " + c[4].Trim() + " " + c[5].Trim(); lineas[n++] = "Medio de pago: " + c[6].Trim(); }
-            lineas[n++] = "Referencia interna: " + NumeroComprobante(numero);
-            lineas[n++] = "Mesa: " + mesa;
-            lineas[n++] = c[3].Trim();
-            lineas[n++] = "---------------------------------------------";
-            string detalle = Ruta("detalle_boleta_" + numero + ".txt");
-            if (File.Exists(detalle))
-            {
-                string[] items = File.ReadAllLines(detalle);
-                for (int i = 0; i < items.Length && n < lineas.Length - 5; i++) lineas[n++] = items[i];
-            }
+            int mesa;
+            if (!int.TryParse(c[1].Trim().Replace("Mesa ", ""), out mesa)) return "No se reconoce la mesa.";
+
+            string encabezado = c[0].Trim();
+            int ultimoEspacio = encabezado.LastIndexOf(' ');
+            string tipoComprobante = ultimoEspacio > 0 ? encabezado.Substring(0, ultimoEspacio) : encabezado;
+            string referencia = NumeroComprobante(numero);
+            string documento = c.Length >= 6 ? (c[4].Trim() + " " + c[5].Trim()).Trim() : "";
+            string medioPago = c.Length >= 7 ? c[6].Trim() : "";
+
+            string detalleRuta = Ruta("detalle_boleta_" + numero + ".txt");
+            string[] detalleItems;
+            if (File.Exists(detalleRuta))
+                detalleItems = File.ReadAllLines(detalleRuta);
             else
-            {
-                lineas[n++] = "Detalle no disponible para esta boleta antigua.";
-            }
-            lineas[n++] = "---------------------------------------------";
-            lineas[n++] = c[2].Trim();
-            lineas[n++] = "Gracias por su visita.";
+                detalleItems = new[] { "Detalle no disponible para este comprobante antiguo." };
+
             Directory.CreateDirectory(Path.Combine(Carpeta, "Comprobantes"));
             string ruta = RutaComprobante(numero);
-            PdfBasico.Crear(ruta, lineas, n);
+            PdfBasico.CrearComprobante(ruta, tipoComprobante, referencia, c[3].Trim(), "Mesa " + mesa,
+                documento, "", medioPago, c[2].Trim(), detalleItems);
             return ruta;
         }
         public string AjustarStock(int id, int cantidad)
@@ -351,7 +361,7 @@ namespace GDImproved.Logica
             if (mesa <= 0 || total <= 0 || total > 100 || !TextoValido(observacion, true))
                 return "Revisa el número de mesa y el pedido.";
             if (TotalPedidos + total > Pedidos.Length) return "No hay espacio para más pedidos.";
-            int[] consumo = new int[101];
+            int[] consumo = new int[MaxInsumos + 1];
             string platosSinReceta = "";
 
             for (int j = 0; j < total; j++)
@@ -410,9 +420,15 @@ namespace GDImproved.Logica
                 int indice = TotalPedidos;
                 Pedidos[TotalPedidos++] = new Pedido
                 {
-                    Id = primerId + j, GrupoId = grupoId, Mesa = mesa,
-                    PlatoId = p.Id, PlatoNombre = p.Nombre, Cantidad = cantidades[j],
-                    Precio = p.Precio, Observacion = observacion, Fecha = fecha
+                    Id = primerId + j,
+                    GrupoId = grupoId,
+                    Mesa = mesa,
+                    PlatoId = p.Id,
+                    PlatoNombre = p.Nombre,
+                    Cantidad = cantidades[j],
+                    Precio = p.Precio,
+                    Observacion = observacion,
+                    Fecha = fecha
                 };
                 for (int i = 0; i < TotalInsumos; i++)
                 {
@@ -509,14 +525,12 @@ namespace GDImproved.Logica
                 return "Para usar RUC selecciona Factura. Si deseas boleta, cambia el tipo y número de documento.";
             if (tipo == "Factura" && documentoTipo != "RUC") return "Para factura selecciona RUC.";
             if (tipo == "Factura" && (numeroDocumento.Length != 11 || !SoloDigitos(numeroDocumento))) return "La factura requiere RUC de 11 dígitos.";
-            if (documentoTipo == "Otro" && tipo == "Factura") return "Otro documento no permite factura.";
             if (tipo != "Boleta simple" && tipo != "Boleta electrónica" && tipo != "Factura") return "Selecciona un comprobante.";
             if (medioPago != "Efectivo" && medioPago != "Tarjeta" && medioPago != "Yape") return "Selecciona un medio de pago.";
             if (numeroDocumento != "")
             {
                 if (documentoTipo == "DNI" && (numeroDocumento.Length != 8 || !SoloDigitos(numeroDocumento))) return "El DNI debe tener 8 dígitos.";
                 if (documentoTipo == "RUC" && (numeroDocumento.Length != 11 || !SoloDigitos(numeroDocumento))) return "El RUC debe tener 11 dígitos.";
-                if ((documentoTipo == "CE" || documentoTipo == "Pasaporte") && (numeroDocumento.Length < 6 || numeroDocumento.Length > 20)) return "Revisa el número de documento.";
             }
             else if (tipo != "Boleta simple") return "Ingresa el documento para esta simulación de comprobante.";
 
@@ -582,14 +596,14 @@ namespace GDImproved.Logica
             File.WriteAllText(Ruta("platos.txt"), texto);
             texto = ""; for (int i = 0; i < TotalInsumos; i++) { Insumo x = Insumos[i]; texto += x.Id + "|" + x.Nombre + "|" + x.Stock + "|" + x.Alerta + "\n"; }
             File.WriteAllText(Ruta("insumos.txt"), texto);
-            texto = ""; for (int p = 1; p <= 100; p++) for (int x = 1; x <= 100; x++) if (Recetas[p, x] > 0) texto += p + "|" + x + "|" + Recetas[p, x] + "\n";
+            texto = ""; for (int p = 1; p <= 100; p++) for (int x = 1; x <= MaxInsumos; x++) if (Recetas[p, x] > 0) texto += p + "|" + x + "|" + Recetas[p, x] + "\n";
             File.WriteAllText(Ruta("recetas.txt"), texto);
             texto = ""; for (int i = 0; i < TotalPedidos; i++) { Pedido p = Pedidos[i]; texto += p.Id + "|" + p.Mesa + "|" + p.PlatoId + "|" + p.PlatoNombre + "|" + p.Cantidad + "|" + p.Precio.ToString(CultureInfo.InvariantCulture) + "|" + p.Observacion + "|" + p.Estado + "|" + p.Fecha + "|" + (p.GrupoId == 0 ? p.Id : p.GrupoId) + "\n"; }
             File.WriteAllText(Ruta("pedidos.txt"), texto);
 
             texto = "";
             for (int i = 0; i < TotalPedidos; i++)
-                for (int x = 1; x <= 100; x++)
+                for (int x = 1; x <= MaxInsumos; x++)
                     if (ReservaIngredientes[i, x] > 0)
                         texto += Pedidos[i].Id + "|" + x + "|" + ReservaIngredientes[i, x] + "\n";
             File.WriteAllText(Ruta("reservas_pedidos.txt"), texto);
@@ -600,7 +614,7 @@ namespace GDImproved.Logica
         public void CargarTodo()
         {
             TotalPlatos = 0; TotalInsumos = 0; TotalPedidos = 0; TotalBoletas = 0;
-            Recetas = new int[101, 101]; ReservaIngredientes = new int[500, 101]; InicializarUsuarios();
+            Recetas = new int[101, MaxInsumos + 1]; ReservaIngredientes = new int[500, MaxInsumos + 1]; InicializarUsuarios();
             string[] lineas; string[] c;
             if (File.Exists(Ruta("platos.txt")))
             {
@@ -610,12 +624,12 @@ namespace GDImproved.Logica
             if (File.Exists(Ruta("insumos.txt")))
             {
                 lineas = File.ReadAllLines(Ruta("insumos.txt"));
-                for (int i = 0; i < lineas.Length && TotalInsumos < 100; i++) { c = lineas[i].Split('|'); if (c.Length != 4) continue; Insumos[TotalInsumos++] = new Insumo { Id = int.Parse(c[0]), Nombre = c[1], Stock = int.Parse(c[2]), Alerta = int.Parse(c[3]) }; }
+                for (int i = 0; i < lineas.Length && TotalInsumos < MaxInsumos; i++) { c = lineas[i].Split('|'); if (c.Length != 4) continue; Insumos[TotalInsumos++] = new Insumo { Id = int.Parse(c[0]), Nombre = c[1], Stock = int.Parse(c[2]), Alerta = int.Parse(c[3]) }; }
             }
             if (File.Exists(Ruta("recetas.txt")))
             {
                 lineas = File.ReadAllLines(Ruta("recetas.txt"));
-                for (int i = 0; i < lineas.Length; i++) { c = lineas[i].Split('|'); if (c.Length != 3) continue; int p = int.Parse(c[0]); int x = int.Parse(c[1]); if (p >= 1 && p <= 100 && x >= 1 && x <= 100) Recetas[p, x] = int.Parse(c[2]); }
+                for (int i = 0; i < lineas.Length; i++) { c = lineas[i].Split('|'); if (c.Length != 3) continue; int p = int.Parse(c[0]); int x = int.Parse(c[1]); if (p >= 1 && p <= 100 && x >= 1 && x <= MaxInsumos) Recetas[p, x] = int.Parse(c[2]); }
             }
             if (File.Exists(Ruta("pedidos.txt")))
             {
@@ -634,7 +648,7 @@ namespace GDImproved.Logica
                     if (!int.TryParse(c[0], out pedidoId) ||
                         !int.TryParse(c[1], out insumoId) ||
                         !int.TryParse(c[2], out cantidad)) continue;
-                    if (insumoId < 1 || insumoId > 100 || cantidad <= 0) continue;
+                    if (insumoId < 1 || insumoId > MaxInsumos || cantidad <= 0) continue;
                     for (int p = 0; p < TotalPedidos; p++)
                         if (Pedidos[p].Id == pedidoId)
                             ReservaIngredientes[p, insumoId] = cantidad;
