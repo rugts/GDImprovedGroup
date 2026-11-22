@@ -1,0 +1,121 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\logica\\sistema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:logica\\sistema.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\firebasesaver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:firebasesaver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\gdimproved.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:gdimproved.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\resources\\appicon\\appiconfg.svg||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:resources\\appicon\\appiconfg.svg||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|c:\\users\\barre\\onedrive\\escritorio\\gdimproved (2)\\gdimproved\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{D6AF3433-203A-8A99-D0B5-910E4DBC1F22}|GDImproved.csproj|solutionrelative:mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GDImproved.csproj",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\GDImproved.csproj",
+              "RelativeDocumentMoniker": "GDImproved.csproj",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\GDImproved.csproj",
+              "RelativeToolTip": "GDImproved.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-15T16:45:36.735Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appiconfg.svg",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\Resources\\AppIcon\\appiconfg.svg",
+              "RelativeDocumentMoniker": "Resources\\AppIcon\\appiconfg.svg",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\Resources\\AppIcon\\appiconfg.svg",
+              "RelativeToolTip": "Resources\\AppIcon\\appiconfg.svg",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKMSURBVDhPjZNLSFRhFMd/3507M/dKPsacsYelWGZZFFJRkdSmNrUoatMiKggSN2YFEUX3MvQiiBYWtFAyggoXPSGyhQuhFrXQFr7GMFOowcZMUO9MM3pPi9Eao6gf/Bcfh3PO/5yPo8jAsqxI5vtvKKXuhMPhK4jInIBlWRH5Bw0NDYOWZUVs264B0DILKEUXCCIpZOIi7uetpHpCxN8GiffU4rrThEIhXzgcXiEidbZtH/5ZQKTV\u002B72oItjSYfG5vxwneoX2/iW80dvxb4ji9D4BIBAIeBsbG4fSOXJWzSR7qpt9D\u002BvWndpTlNXL2HCQ28PXaIuVEB2Dmsp8DiZqyN35FAFiw19IJpPcbmrq0wCq7\u002BvHd5Y\u002B2rMy5y3OcBXmqtccq9rB/uUFKI/GzfZRPhRdBhEQIRgKUlxSAoAm0uqtWNB5Yu\u002Bier5\u002BWOoWbnxAwAwQzDao3lLIobX5ePxemiImroCIzFm\u002BztT7/CPLzi8ej\u002BVxdeyu1nJjgMR3FwDl0fD4dJRHozuWACStjM/TGDlZ50tNqHuxejo\u002B\u002BZPL8wwqCvxUFPhZFfBSbIBMJti0wJjpDpJRQXfjzr6uj9u\u002BtYysCWijA4OPqzeXpVLJtE010zS9cZDM1DTa9ASLmoaOnh4cEYaySsoa30T5Mp5kPD7Ni\u002B5Rtt7qofzqO553jqQHmHExi5p8RcRNsb6y7VWtnm1ecjUdcdM7QClwhQPl8zi3o\u002BiXdREMMwvbtvv0KYfmRJSBtvlVY93O6ujLlc8WdsYcdE1RmutlV3kO20tzcXFRohBFerQ/ccE6c11EJB53xIk7EndmNSnObxIRsSwrMucWUvh2AxiGiWmYGOassjB/0yxzzPzvOWfyAyvlXYiiBFoWAAAAAElFTkSuQmCC",
+              "WhenOpened": "2026-11-15T16:26:53.712Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "MainPage.xaml.cs",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\MainPage.xaml.cs",
+              "RelativeToolTip": "MainPage.xaml.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAADwv0IAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T15:31:04.503Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainPage.xaml",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\MainPage.xaml",
+              "RelativeDocumentMoniker": "MainPage.xaml",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\MainPage.xaml",
+              "RelativeToolTip": "MainPage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-11-15T15:31:00.441Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FirebaseSaver.cs",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\FirebaseSaver.cs",
+              "RelativeDocumentMoniker": "FirebaseSaver.cs",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\FirebaseSaver.cs",
+              "RelativeToolTip": "FirebaseSaver.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T15:22:36.699Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Sistema.cs",
+              "DocumentMoniker": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\Logica\\Sistema.cs",
+              "RelativeDocumentMoniker": "Logica\\Sistema.cs",
+              "ToolTip": "C:\\Users\\barre\\OneDrive\\Escritorio\\GDImproved (2)\\GDImproved\\Logica\\Sistema.cs",
+              "RelativeToolTip": "Logica\\Sistema.cs",
+              "ViewState": "AgIAAO0BAAAAAAAAAAAAAMwCAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-14T16:01:11.212Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

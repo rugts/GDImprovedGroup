@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Application
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:GDImproved"
+    x:Class="GDImproved.App">
+
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="Label">
+                <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                <Setter Property="TextColor" Value="#000000"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                <Setter Property="TextColor" Value="#000000"/>
+            </Style>
+
+            <Style TargetType="Entry">
+                <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                <Setter Property="TextColor" Value="#000000"/>
+            </Style>
+
+            <Style TargetType="Picker">
+                <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                <Setter Property="TextColor" Value="#000000"/>
+            </Style>
+
+            <Style TargetType="Editor">
+                <Setter Property="FontFamily" Value="FuenteGoodMoov"/>
+                <Setter Property="TextColor" Value="#000000"/>
+            </Style>
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>
