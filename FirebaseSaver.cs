@@ -12,10 +12,10 @@ namespace GDImproved
 {
     public class FirebaseSaver
     {
-        // IMPORTANTE: Reemplaza esta URL por la de tu Realtime Database en la consola de Firebase (debe terminar en /)
+       
         private readonly FirebaseClient _client = new FirebaseClient("https://gdimproved-default-rtdb.firebaseio.com/");
 
-        // Sube todo el estado de Sistema.cs a Firebase
+  
         public async Task SincronizarTodoAsync(Sistema sistema)
         {
             if (sistema == null || sistema.ModoPractica) return;
@@ -57,19 +57,19 @@ namespace GDImproved
         {
             if (sistema == null || sistema.ModoPractica) return;
 
-            // Se conecta al nodo "pedidos" y se queda escuchando cualquier cambio o inserción
+     
             _client
                 .Child("good_moov")
                 .Child("pedidos")
                 .AsObservable<Pedido>()
                 .Subscribe(d =>
                 {
-                    // Cada vez que cambie algo en la nube, descargamos la lista completa o actualizamos
+        
                     Task.Run(async () =>
                     {
                         await CargarDesdeFirebaseAsync(sistema);
 
-                        // Ejecuta la actualización visual en el hilo principal de la interfaz
+     
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             onActualizarUI?.Invoke();
@@ -77,7 +77,7 @@ namespace GDImproved
                     });
                 });
         }
-        // Descarga los datos de Firebase hacia Sistema.cs
+
         public async Task CargarDesdeFirebaseAsync(Sistema sistema)
         {
             if (sistema == null || sistema.ModoPractica) return;
@@ -129,7 +129,7 @@ namespace GDImproved
                             sistema.Boletas[sistema.TotalBoletas++] = b;
                 }
 
-                // Guarda en los archivos .txt locales sin volver a disparar la subida infinita
+  
                 sistema.GuardarSoloLocal();
             }
             catch (Exception ex)
