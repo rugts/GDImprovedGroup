@@ -209,63 +209,130 @@ namespace GDImproved.Logica
         }
 
         int OrdenCategoria(string categoria)
+
         {
-            string nombre = categoria.Trim().ToLowerInvariant();
-            if (nombre == "entrada" || nombre == "entradas") return 0;
-            if (nombre == "plato fuerte" || nombre == "platos fuertes" || nombre == "fondo" || nombre == "fondos") return 1;
-            if (nombre == "postre" || nombre == "postres") return 2;
-            if (nombre == "bebida" || nombre == "bebidas") return 3;
-            return 4;
+
+            string nombre = (categoria ?? "").Trim().ToLowerInvariant();
+
+            if (nombre == "morning mood") return 0;
+
+            if (nombre == "sandwiches") return 1;
+
+            if (nombre == "brunch & bowls") return 2;
+
+            if (nombre == "para compartir") return 3;
+
+            if (nombre == "ensaladas") return 4;
+
+            if (nombre == "wraps") return 5;
+
+            if (nombre == "entrada" || nombre == "entradas") return 6;
+
+            if (nombre == "plato fuerte" || nombre == "platos fuertes" || nombre == "fondo" || nombre == "fondos") return 7;
+
+            if (nombre == "pizzas artesanales") return 8;
+
+            if (nombre == "postre" || nombre == "postres") return 9;
+
+            if (nombre == "café" || nombre == "cafe") return 10;
+
+            if (nombre == "infusiones") return 11;
+
+            if (nombre == "matcha & chai") return 12;
+
+            if (nombre == "smoothies") return 13;
+
+            if (nombre == "batidos proteicos") return 14;
+
+            if (nombre == "bebida" || nombre == "bebidas") return 15;
+
+            if (nombre == "extras") return 16;
+
+            return 99;
+
         }
+
+
+
         public string CartaOrdenada()
+
         {
+
             if (TotalPlatos == 0) return "Carta vacía.";
+
             Plato[] ordenados = new Plato[TotalPlatos];
+
             for (int i = 0; i < TotalPlatos; i++) ordenados[i] = Platos[i];
 
+
+
             for (int i = 0; i < TotalPlatos - 1; i++)
+
             {
+
                 for (int j = 0; j < TotalPlatos - i - 1; j++)
+
                 {
+
                     Plato primero = ordenados[j];
+
                     Plato segundo = ordenados[j + 1];
+
                     int categoria1 = OrdenCategoria(primero.Categoria);
+
                     int categoria2 = OrdenCategoria(segundo.Categoria);
+
                     bool intercambiar = categoria1 > categoria2;
+
                     if (categoria1 == categoria2 && primero.Precio > segundo.Precio)
+
                         intercambiar = true;
+
                     if (intercambiar)
+
                     {
+
                         ordenados[j] = segundo;
+
                         ordenados[j + 1] = primero;
+
                     }
+
                 }
+
             }
+
+
 
             string texto = "";
-            int grupoAnterior = -1;
-            for (int i = 0; i < TotalPlatos; i++)
-            {
-                Plato plato = ordenados[i];
-                int grupo = OrdenCategoria(plato.Categoria);
-                if (grupo != grupoAnterior)
-                {
-                    grupoAnterior = grupo;
-                    string titulo = "OTROS";
-                    if (grupo == 0) titulo = "ENTRADAS";
-                    else if (grupo == 1) titulo = "PLATOS FUERTES";
-                    else if (grupo == 2) titulo = "POSTRES";
-                    else if (grupo == 3) titulo = "BEBIDAS";
-                    texto += "\n" + titulo + "\n";
-                }
-                texto += "- " + plato.Nombre + " | S/ " + plato.Precio.ToString("0.00", CultureInfo.InvariantCulture)
-                    + " | Disponibles: " + Disponibles(plato.Id);
-                if (grupo == 4) texto += " | " + plato.Categoria;
-                texto += "\n";
-            }
-            return texto;
-        }
 
+            string categoriaAnterior = null;
+
+            for (int i = 0; i < ordenados.Length; i++)
+
+            {
+
+                Plato plato = ordenados[i];
+
+                if (!string.Equals(plato.Categoria, categoriaAnterior, StringComparison.OrdinalIgnoreCase))
+
+                {
+
+                    categoriaAnterior = plato.Categoria;
+
+                    texto += "\n" + plato.Categoria.ToUpperInvariant() + "\n";
+
+                }
+
+                texto += "- " + plato.Nombre + " | S/ " + plato.Precio.ToString("0.00", CultureInfo.InvariantCulture)
+
+                  + " | Disponibles: " + Disponibles(plato.Id) + "\n";
+
+            }
+
+            return texto;
+
+        }
         public string NumeroComprobante(int indice)
         {
             if (indice < 1 || indice > TotalBoletas) return "";
