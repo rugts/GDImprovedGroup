@@ -1085,15 +1085,48 @@ namespace GDImproved
         }
 
         int OrdenCategoriaCarta(string categoria)
-        {
-            string nombre = (categoria ?? "").Trim().ToLowerInvariant();
-            if (nombre == "entrada" || nombre == "entradas") return 0;
-            if (nombre == "plato fuerte" || nombre == "platos fuertes" || nombre == "fondo" || nombre == "fondos") return 1;
-            if (nombre == "postre" || nombre == "postres") return 2;
-            if (nombre == "bebida" || nombre == "bebidas") return 3;
-            return 4;
-        }
+            {
 
+                string nombre = (categoria ?? "").Trim().ToLowerInvariant();
+
+                if (nombre == "morning mood") return 0;
+
+                if (nombre == "sandwiches") return 1;
+
+                if (nombre == "brunch & bowls") return 2;
+
+                if (nombre == "para compartir") return 3;
+
+                if (nombre == "ensaladas") return 4;
+
+                if (nombre == "wraps") return 5;
+
+                if (nombre == "entrada" || nombre == "entradas") return 6;
+
+                if (nombre == "plato fuerte" || nombre == "platos fuertes" || nombre == "fondo" || nombre == "fondos") return 7;
+
+                if (nombre == "pizzas artesanales") return 8;
+
+                if (nombre == "postre" || nombre == "postres") return 9;
+
+                if (nombre == "café" || nombre == "cafe") return 10;
+
+                if (nombre == "infusiones") return 11;
+
+                if (nombre == "matcha & chai") return 12;
+
+                if (nombre == "smoothies") return 13;
+
+                if (nombre == "batidos proteicos") return 14;
+
+                if (nombre == "bebida" || nombre == "bebidas") return 15;
+
+                if (nombre == "extras") return 16;
+
+                return 99;
+
+            }
+        
         Border CrearCeldaTabla(string valor, bool encabezado, bool centrado, bool alternada, bool advertencia = false)
         {
             var etiqueta = new Label
